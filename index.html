@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Weekend Working Tracker - User Information">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Weekend Working Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="header">
+        <h1>Weekend Working Tracker</h1>
+        <button id="logout-btn" class="logout-btn">
+            Logout
+        </button>
+    </div>
+
+    <main>
+        <div id="account-creation">
+            <h2>Create Your Account</h2>
+            <form id="account-form">
+                <div class="form-group">
+                    <label for="ps-id">PS ID</label>
+                    <input type="text" id="ps-id" name="ps-id" required placeholder="Enter your PS ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email address">
+                </div>
+
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+
+        <div id="user-info" style="display:none;">
+            <div id="user-info-display" class="user-info"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = localStorage.getItem('userData');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('account-creation').style.display = 'none';
+            displayUserInfo();
+
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('userData');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
