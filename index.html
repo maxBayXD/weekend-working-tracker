@@ -1,70 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Weekend Working Tracker - User Information">
+    <meta name="description" content="Weekend Working Tracker - Dashboard">
     <meta name="theme-color" content="#4CAF50">
     <title>Weekend Working Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
-    <div class="header">
-        <h1>Weekend Working Tracker</h1>
-        <button id="logout-btn" class="logout-btn">
-            Logout
-        </button>
-    </div>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">Weekend Working Tracker</a>
+            <button class="hamburger" id="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="navbar-links" id="nav-links">
+                <a href="index.html" class="active">Dashboard</a>
+                <a href="settings.html"><i class="fas fa-gear"></i></a>
+            </div>
+        </div>
+    </nav>
 
     <main>
-        <div id="account-creation">
-            <h2>Create Your Account</h2>
-            <form id="account-form">
-                <div class="form-group">
-                    <label for="ps-id">PS ID</label>
-                    <input type="text" id="ps-id" name="ps-id" required placeholder="Enter your PS ID">
+        <div class="container">
+            <div id="admin-dashboard" style="display: none;">
+                <h1>Admin Dashboard</h1>
+                <div class="admin-controls">
+                    <button id="add-user-btn" class="primary-button">
+                        <i class="fas fa-user-plus"></i> Add New User
+                    </button>
                 </div>
-
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                <div id="users-list" class="users-grid">
+                    <!-- Users will be populated here -->
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your email address">
+            <div id="user-dashboard">
+                <h1>Welcome to Weekend Working Tracker</h1>
+                <div class="dashboard-content">
+                    <div class="dashboard-card">
+                        <h2>Your Weekend Working Status</h2>
+                        <p>Track and manage your weekend working hours here.</p>
+                    </div>
                 </div>
-
-                <button type="submit">Create Account</button>
-            </form>
+            </div>
         </div>
 
-        <div id="user-info" style="display:none;">
-            <div id="user-info-display" class="user-info"></div>
+        <!-- Add/Edit User Modal -->
+        <div id="user-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Add New User</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <form id="user-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="modal-ps-id">PS ID:</label>
+                        <input type="text" id="modal-ps-id" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-name">Name:</label>
+                        <input type="text" id="modal-name" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-email">Email:</label>
+                        <input type="email" id="modal-email" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-password">Password:</label>
+                        <input type="password" id="modal-password" required autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="modal-is-admin" autocomplete="off">
+                            Admin User
+                        </label>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="primary-button">
+                            <i class="fas fa-check"></i> Save
+                        </button>
+                        <button type="button" class="secondary-button close-modal">
+                            <i class="fas fa-xmark"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alert-modal" class="alert-modal">
+            <div class="alert-modal-content">
+                <div class="alert-modal-header">
+                    <i class="fas"></i>
+                    <h3></h3>
+                </div>
+                <div class="alert-modal-body"></div>
+                <div class="alert-modal-footer">
+                    <button type="button" class="primary-button" id="alert-confirm-btn">OK</button>
+                    <button type="button" class="secondary-button" id="alert-cancel-btn">Cancel</button>
+                </div>
+            </div>
         </div>
     </main>
 
-    <script>
+    <script type="module">
+        import { isAuthenticated, getCurrentUser, applyTheme, getCurrentTheme } from './js/utils.js';
+        import UserManager from './js/user-management.js';
+
+        // Make UserManager available globally
+        window.UserManager = UserManager;
+
         document.addEventListener('DOMContentLoaded', () => {
-            const userData = localStorage.getItem('userData');
-            if (!userData) {
-                window.location.href = 'login.html';
+            if (!isAuthenticated()) {
+                window.location.href = 'authentication.html';
                 return;
             }
 
-            document.getElementById('user-info').style.display = 'block';
-            document.getElementById('account-creation').style.display = 'none';
-            displayUserInfo();
+            // Apply saved theme
+            applyTheme(getCurrentTheme());
 
-            document.getElementById('logout-btn').addEventListener('click', () => {
-                localStorage.removeItem('userData');
-                window.location.href = 'login.html';
+            // Show admin or user dashboard based on user role
+            const user = getCurrentUser();
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const userDashboard = document.getElementById('user-dashboard');
+
+            if (user.isAdmin) {
+                adminDashboard.style.display = 'block';
+                userDashboard.style.display = 'none';
+                UserManager.initialize();
+            } else {
+                adminDashboard.style.display = 'none';
+                userDashboard.style.display = 'block';
+            }
+
+            // Hamburger menu functionality
+            const hamburger = document.getElementById('hamburger-menu');
+            const navLinks = document.getElementById('nav-links');
+            
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
             });
         });
     </script>
-    <script src="scripts.js"></script>
 </body>
 
 </html>
