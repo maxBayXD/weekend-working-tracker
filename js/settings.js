@@ -115,7 +115,11 @@ class SettingsManager {
             input.type = 'password';
         });
 
-        await showSuccess('Success', 'Password changed successfully');
+        // Show success message and then logout
+        await showSuccess('Success', 'Password changed successfully. You will be logged out for security reasons.');
+        
+        // Logout after showing success message
+        logout();
     }
 
     static isPasswordStrong(password) {

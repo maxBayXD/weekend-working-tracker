@@ -41,6 +41,12 @@ function logout() {
 function showAlert(type, title, message, showCancelButton = false) {
     return new Promise((resolve) => {
         const modal = document.getElementById('alert-modal');
+        if (!modal) {
+            console.error('Alert modal not found!');
+            resolve(false); // Resolve with false if modal is not found
+            return;
+        }
+
         const icon = modal.querySelector('.alert-modal-header i');
         const titleEl = modal.querySelector('.alert-modal-header h3');
         const body = modal.querySelector('.alert-modal-body');

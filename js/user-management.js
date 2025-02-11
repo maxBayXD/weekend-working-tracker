@@ -1,13 +1,23 @@
 import { getUsers, saveUsers, showWarning, showError, showSuccess } from './utils.js';
 
 class UserManager {
+    static editingUserId = null;
+
+    // Initialization
     static initialize() {
+        this.initializeEventListeners();
+        this.loadUsers();
+    }
+
+    static initializeEventListeners() {
+        this.initializeModalControls();
+        this.initializePasswordToggle();
+    }
+
+    static initializeModalControls() {
         const addUserBtn = document.getElementById('add-user-btn');
-        const userModal = document.getElementById('user-modal');
         const userForm = document.getElementById('user-form');
         const closeButtons = document.querySelectorAll('.close-modal');
-        const passwordField = document.getElementById('modal-password');
-        const passwordLabel = document.querySelector('label[for="modal-password"]');
 
         if (addUserBtn) {
             addUserBtn.addEventListener('click', () => this.showModal());
@@ -22,16 +32,26 @@ class UserManager {
         if (userForm) {
             userForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
         }
-
-        this.loadUsers();
     }
 
+    static initializePasswordToggle() {
+        const togglePassword = document.querySelector('.toggle-password');
+        if (togglePassword) {
+            togglePassword.addEventListener('click', () => this.togglePasswordVisibility(togglePassword));
+        }
+    }
+
+    // User Management
     static loadUsers() {
         const usersList = document.getElementById('users-list');
         if (!usersList) return;
 
         const users = getUsers();
-        usersList.innerHTML = users.map(user => `
+        usersList.innerHTML = users.map(user => this.createUserCard(user)).join('');
+    }
+
+    static createUserCard(user) {
+        return `
             <div class="user-card">
                 <div class="user-card-header">
                     <h3 class="user-card-title">${user.name}</h3>
@@ -50,9 +70,10 @@ class UserManager {
                 </div>
                 ${user.isAdmin ? '<span class="user-card-badge">Admin</span>' : ''}
             </div>
-        `).join('');
+        `;
     }
 
+    // Modal Management
     static showModal(title = 'Add New User') {
         const userModal = document.getElementById('user-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -62,15 +83,10 @@ class UserManager {
         modalTitle.textContent = title;
         userModal.classList.add('active');
         
-        if (this.editingUserId) {
-            passwordField.style.display = 'none';
-            passwordLabel.style.display = 'none';
-            passwordField.required = false;
-        } else {
-            passwordField.style.display = 'block';
-            passwordLabel.style.display = 'block';
-            passwordField.required = true;
-        }
+        const isEditing = !!this.editingUserId;
+        passwordField.style.display = isEditing ? 'none' : 'block';
+        passwordLabel.style.display = isEditing ? 'none' : 'block';
+        passwordField.required = !isEditing;
     }
 
     static hideModal() {
@@ -81,15 +97,13 @@ class UserManager {
         this.editingUserId = null;
     }
 
-    static editUser(psId) {
+    // User Operations
+    static async editUser(psId) {
         const users = getUsers();
         const user = users.find(u => u.psId === psId);
         if (user) {
             this.editingUserId = psId;
-            document.getElementById('modal-ps-id').value = user.psId;
-            document.getElementById('modal-name').value = user.name;
-            document.getElementById('modal-email').value = user.email;
-            document.getElementById('modal-is-admin').checked = user.isAdmin;
+            this.populateForm(user);
             this.showModal('Edit User');
         }
     }
@@ -112,37 +126,76 @@ class UserManager {
 
     static async handleFormSubmit(e) {
         e.preventDefault();
-        const formData = {
+        const formData = this.getFormData();
+        const isEditing = !!this.editingUserId;
+
+        if (!this.validateFormData(formData, isEditing)) {
+            return;
+        }
+
+        await this.saveUser(formData, isEditing);
+    }
+
+    // Helper Methods
+    static populateForm(user) {
+        document.getElementById('modal-ps-id').value = user.psId;
+        document.getElementById('modal-name').value = user.name;
+        document.getElementById('modal-email').value = user.email;
+        document.getElementById('modal-is-admin').checked = user.isAdmin;
+    }
+
+    static getFormData() {
+        return {
             psId: document.getElementById('modal-ps-id').value,
             name: document.getElementById('modal-name').value,
             email: document.getElementById('modal-email').value,
-            isAdmin: document.getElementById('modal-is-admin').checked
+            isAdmin: document.getElementById('modal-is-admin').checked,
+            password: document.getElementById('modal-password')?.value
         };
+    }
 
+    static validateFormData(formData, isEditing) {
         const users = getUsers();
+        if (!isEditing && users.some(u => u.psId === formData.psId)) {
+            showError('Error', 'PS ID already exists! Please choose a different PS ID.');
+            return false;
+        }
+        return true;
+    }
 
-        if (this.editingUserId) {
+    static async saveUser(formData, isEditing) {
+        const users = getUsers();
+        
+        if (isEditing) {
             const userIndex = users.findIndex(u => u.psId === this.editingUserId);
             if (userIndex !== -1) {
                 formData.password = users[userIndex].password;
                 users[userIndex] = formData;
             }
         } else {
-            if (users.some(u => u.psId === formData.psId)) {
-                await showError('Error', 'PS ID already exists! Please choose a different PS ID.');
-                return;
-            }
-            formData.password = document.getElementById('modal-password').value;
             users.push(formData);
         }
 
         saveUsers(users);
         this.hideModal();
         this.loadUsers();
-        await showSuccess(
-            'Success',
-            this.editingUserId ? 'User has been successfully updated.' : 'New user has been successfully added.'
-        );
+
+        const message = isEditing 
+            ? 'User details have been successfully updated.'
+            : 'New user has been successfully added.';
+        
+        await showSuccess('Success', message);
+    }
+
+    static togglePasswordVisibility(button) {
+        const targetId = button.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const icon = button.querySelector('i');
+        
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', !isPassword);
+        icon.classList.toggle('fa-eye-slash', isPassword);
     }
 }
 
