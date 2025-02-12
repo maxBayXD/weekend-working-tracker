@@ -1,60 +1,67 @@
 # Weekend Working Tracker
 
-A web application to track and manage weekend working hours for employees.
+A web-based application to track weekend working hours, comp-offs, and expense claims.
 
 ## Features
 
 - **User Authentication**
-  - Secure login and registration system
-  - Password strength validation
-  - Password visibility toggle
+  - Login/Signup functionality
+  - Role-based access (Admin/User)
+  - Password security with requirements
   - Session management
 
-- **User Management**
-  - Admin dashboard for user management
-  - Create, update, and delete users
-  - Role-based access control (Admin/User)
+- **Admin Dashboard**
+  - User management (Add/Edit/Delete)
+  - View all users
+  - Manage user roles
+  - Default admin account (psId: admin, password: Admin@123)
 
-- **Settings Management**
-  - Dark/Light theme toggle
+- **User Dashboard**
+  - Track weekend working details
+  - Record comp-off status
+  - Manage expense claims
+  - View history in tabular format
+
+- **Settings**
+  - Theme toggle (Light/Dark mode)
   - Password change functionality
-  - User profile information display
-  - Last login tracking
+  - View profile information
 
-- **UI/UX Features**
-  - Responsive design for all devices
-  - Modern and clean interface
-  - Custom alert modals
-  - Expandable sections
-  - Password visibility toggles
-  - Form validation
+## Technical Stack
+
+- Vanilla JavaScript (ES6+)
+- HTML5
+- CSS3
+- LocalStorage for data persistence
+- Font Awesome for icons
 
 ## Getting Started
 
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (can use VS Code Live Server or any HTTP server)
-
-### Installation
-
 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/weekend-working-tracker.git
-cd weekend-working-tracker
-```
+2. Open `index.html` in a modern web browser
+3. Login with default admin credentials:
+   - PS ID: `admin`
+   - Password: `Admin@123`
 
-2. Open the project in your preferred code editor
+## Usage
 
-3. Start a local web server in the project directory
-   - Using VS Code: Install "Live Server" extension and click "Go Live"
-   - Using Python: `python -m http.server 8000`
-   - Using Node.js: `npx http-server`
+### Admin Users
 
-4. Access the application in your browser at `http://localhost:8000` (or the port your server is using)
+1. Login with admin credentials
+2. Manage users through the admin dashboard
+3. Add new users with the "Add User" button
+4. Edit or delete existing users
 
-### Default Admin Credentials
-- PS ID: admin
-- Password: admin123
+### Regular Users
+
+1. Login with your credentials
+2. Click "Add Weekend Entry" to record new weekend work
+3. Fill in the required details:
+   - Weekend Date
+   - Comp Off Earned (Yes/No)
+   - Comp Off Availed Date (if applicable)
+   - Expense Claimed (Yes/No/Pending)
+4. View your entries in the table below
 
 ## Project Structure
 
@@ -64,47 +71,16 @@ weekend-working-tracker/
 │   └── styles.css
 ├── js/
 │   ├── auth.js
+│   ├── index.js
 │   ├── settings.js
 │   ├── user-management.js
-│   └── utils.js
+│   ├── utils.js
+│   └── weekend-tracker.js
 ├── index.html
 ├── authentication.html
 ├── settings.html
 └── README.md
 ```
-
-## Features in Detail
-
-### Authentication
-- User registration with email verification
-- Secure password requirements
-- Session-based authentication
-- Remember me functionality
-
-### User Management
-- Admin dashboard for user overview
-- Add new users
-- Edit user details
-- Delete users
-- Role assignment (Admin/User)
-
-### Settings
-- Theme customization (Dark/Light mode)
-- Password management
-- Profile information display
-- Session management
-
-## Security Features
-
-- Password strength requirements:
-  - Minimum 8 characters
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one number
-  - At least one special character
-- Form validation
-- Session management
-- Role-based access control
 
 ## Browser Support
 
@@ -113,20 +89,50 @@ weekend-working-tracker/
 - Safari (latest)
 - Edge (latest)
 
+## Security Features
+
+- Password hashing simulation
+- Session management
+- Input sanitization
+- Form validation
+- Role-based access control
+
+## Local Storage Schema
+
+```javascript
+{
+  users: [
+    {
+      psId: string,
+      name: string,
+      email: string,
+      password: string,
+      isAdmin: boolean,
+      lastLogin: string,
+      theme: string
+    }
+  ],
+  weekendEntries: [
+    {
+      userId: string,
+      weekendDate: string,
+      compOffEarned: string,
+      compOffDate: string,
+      expenseClaimed: string,
+      createdAt: string
+    }
+  ]
+}
+```
+
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Font Awesome for icons
-- Modern CSS features
-- LocalStorage for client-side data persistence
+MIT License - feel free to use this project for learning purposes.
