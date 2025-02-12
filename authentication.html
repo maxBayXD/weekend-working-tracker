@@ -32,18 +32,20 @@
                             <label for="login-psid">
                                 <i class="fas fa-user"></i> PS ID:
                             </label>
-                            <input type="text" id="login-psid" required placeholder="Enter your PS ID">
+                            <input type="text" id="login-psid" placeholder="Enter your PS ID">
+                            <div class="helper-text error">Please enter your PS ID</div>
                         </div>
                         <div class="form-group">
                             <label for="login-password">
                                 <i class="fas fa-lock"></i> Password:
                             </label>
                             <div class="password-input-group">
-                                <input type="password" id="login-password" required placeholder="Enter your password">
+                                <input type="password" id="login-password" placeholder="Enter your password">
                                 <button type="button" class="toggle-password" data-target="login-password">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <div class="helper-text error">Please enter your password</div>
                         </div>
                         <button type="submit" class="primary-button">
                             <i class="fas fa-sign-in-alt"></i> Login
@@ -62,12 +64,15 @@
                                 <i class="fas fa-user"></i> PS ID:
                             </label>
                             <input type="text" id="ps-id" required autocomplete="off" placeholder="Enter your PS ID">
+                            <div class="helper-text required">Please enter your PS ID (this cannot be changed later)
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="name">
                                 <i class="fas fa-user-circle"></i> Name:
                             </label>
                             <input type="text" id="name" required autocomplete="off" placeholder="Enter your full name">
+                            <div class="helper-text required">Please enter your full name</div>
                         </div>
                         <div class="form-group">
                             <label for="signup-email">
@@ -75,6 +80,7 @@
                             </label>
                             <input type="email" id="signup-email" required autocomplete="off"
                                 placeholder="Enter your email">
+                            <div class="helper-text required">Please enter a valid email address</div>
                         </div>
                         <div class="form-group">
                             <label for="signup-password">
@@ -87,6 +93,8 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <div class="helper-text required">Password must be at least 8 characters with uppercase,
+                                lowercase, number and special character</div>
                         </div>
                         <div class="form-group">
                             <label for="confirm-password">
@@ -99,6 +107,7 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <div class="helper-text required">Please confirm your password</div>
                         </div>
                         <button type="submit" class="primary-button">
                             <i class="fas fa-user-plus"></i> Sign Up

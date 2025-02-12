@@ -42,12 +42,68 @@
             </div>
 
             <div id="user-dashboard">
-                <h1>Welcome to Weekend Working Tracker</h1>
+                <h1>Weekend Working Tracker</h1>
                 <div class="dashboard-content">
-                    <div class="dashboard-card">
-                        <h2>Your Weekend Working Status</h2>
-                        <p>Track and manage your weekend working hours here.</p>
+                    <button id="add-weekend-entry" class="primary-button">
+                        <i class="fas fa-plus"></i> Add Weekend Entry
+                    </button>
+
+                    <div id="weekend-entries" class="weekend-entries">
+                        <!-- Weekend entries will be populated here -->
                     </div>
+                </div>
+            </div>
+
+            <!-- Weekend Entry Modal -->
+            <div id="weekend-modal" class="modal weekend-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Add Weekend Working Entry</h2>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <form id="weekend-form" class="weekend-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weekend-date">Weekend Date</label>
+                                <input type="date" id="weekend-date" required>
+                                <div class="helper-text">Select the weekend date</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="comp-off-earned">Comp Off Earned</label>
+                                <select id="comp-off-earned" required>
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                                <div class="helper-text">Indicate if comp off was earned</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" id="comp-off-date-group">
+                                <label for="comp-off-date">Comp Off Availed Date</label>
+                                <input type="date" id="comp-off-date">
+                                <div class="helper-text">Select when comp off was availed (if applicable)</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-claimed">Expense Claimed</label>
+                                <select id="expense-claimed" required>
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                                <div class="helper-text">Indicate expense claim status</div>
+                            </div>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="primary-button">
+                                <i class="fas fa-save"></i> Save Entry
+                            </button>
+                            <button type="button" class="secondary-button close-modal">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -118,6 +174,7 @@
     <script type="module">
         import { isAuthenticated, getCurrentUser, applyTheme, getCurrentTheme } from './js/utils.js';
         import UserManager from './js/user-management.js';
+        import WeekendTracker from './js/weekend-tracker.js';
 
         // Make UserManager available globally
         window.UserManager = UserManager;
@@ -143,12 +200,13 @@
             } else {
                 adminDashboard.style.display = 'none';
                 userDashboard.style.display = 'block';
+                WeekendTracker.initialize();
             }
 
             // Hamburger menu functionality
             const hamburger = document.getElementById('hamburger-menu');
             const navLinks = document.getElementById('nav-links');
-            
+
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
                 navLinks.classList.toggle('active');

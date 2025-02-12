@@ -10,16 +10,28 @@ function getCurrentTheme() {
 
 // User Management
 function getUsers() {
-    return JSON.parse(localStorage.getItem('users') || '[]');
+    try {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        return Array.isArray(users) ? users : [];
+    } catch (error) {
+        console.error('Error parsing users:', error);
+        return [];
+    }
 }
 
 function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
+    try {
+        if (!Array.isArray(users)) throw new Error('Invalid users data');
+        localStorage.setItem('users', JSON.stringify(users));
+    } catch (error) {
+        console.error('Error saving users:', error);
+        throw error;
+    }
 }
 
 // Authentication Utils
 function isAuthenticated() {
-    return !!localStorage.getItem('userData');
+    return !!localStorage.getItem('userData') && isSessionValid();
 }
 
 function getCurrentUser() {
@@ -34,6 +46,8 @@ function isAdmin() {
 
 function logout() {
     localStorage.removeItem('userData');
+    localStorage.removeItem('sessionExpiry');
+    // Do not remove theme from localStorage anymore
     window.location.href = 'authentication.html';
 }
 
@@ -118,6 +132,32 @@ function showInfo(title, message) {
     return showAlert('info', title, message);
 }
 
+// Add input sanitization
+export function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input.replace(/[<>&"']/g, (match) => {
+        const entities = {
+            '<': '&lt;',
+            '>': '&gt;',
+            '&': '&amp;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        return entities[match];
+    });
+}
+
+// Add session management
+function isSessionValid() {
+    const session = localStorage.getItem('sessionExpiry');
+    return session && Number(session) > Date.now();
+}
+
+function refreshSession() {
+    const SESSION_DURATION = 3600000; // 1 hour
+    localStorage.setItem('sessionExpiry', Date.now() + SESSION_DURATION);
+}
+
 // Export all functions
 export {
     applyTheme,
@@ -131,5 +171,6 @@ export {
     showSuccess,
     showError,
     showWarning,
-    showInfo
-}; 
+    showInfo,
+    refreshSession  // Add this export
+};

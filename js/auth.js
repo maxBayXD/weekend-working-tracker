@@ -1,9 +1,10 @@
-import { getUsers, saveUsers, showError, showSuccess } from './utils.js';
+import { getUsers, saveUsers, showError, showSuccess, sanitizeInput, refreshSession, applyTheme } from './utils.js';
 
 class AuthManager {
     // Constants
     static PASSWORD_REQUIREMENTS = {
         minLength: 8,
+        maxLength: 128,
         patterns: {
             uppercase: /[A-Z]/,
             lowercase: /[a-z]/,
@@ -16,9 +17,10 @@ class AuthManager {
         psId: 'admin',
         name: 'Admin User',
         email: 'admin@example.com',
-        password: 'admin123', // In a real app, this should be hashed
+        password: 'Admin@123', // Changed to meet password requirements
         isAdmin: true,
-        lastLogin: null
+        lastLogin: null,
+        theme: 'light'
     };
 
     // Initialization
@@ -29,9 +31,12 @@ class AuthManager {
 
     static initializeDefaultAdmin() {
         const users = getUsers();
-        if (users.length === 0) {
+        // Check if admin exists
+        const adminExists = users.some(user => user.psId === 'admin');
+        if (!adminExists) {
             users.push(this.DEFAULT_ADMIN);
             saveUsers(users);
+            console.log('Default admin account created');
         }
     }
 
@@ -46,11 +51,79 @@ class AuthManager {
         const signupForm = document.getElementById('signup-form');
 
         if (loginForm) {
+            this.addInputValidation(loginForm);
             loginForm.addEventListener('submit', (e) => this.handleLogin(e));
         }
         if (signupForm) {
+            this.addInputValidation(signupForm);
             signupForm.addEventListener('submit', (e) => this.handleSignup(e));
         }
+    }
+
+    static addInputValidation(form) {
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            // Add validation listeners
+            input.addEventListener('blur', () => this.validateField(input));
+            input.addEventListener('input', () => this.clearError(input));
+        });
+    }
+
+    static validateField(input) {
+        const formGroup = input.closest('.form-group');
+        const helperText = formGroup.querySelector('.helper-text');
+
+        // Clear existing error state
+        formGroup.classList.remove('error');
+        helperText?.classList.remove('visible');
+
+        // Validate field
+        let isValid = true;
+        let errorMessage = '';
+
+        if (!input.value) {
+            isValid = false;
+            errorMessage = `${input.placeholder} is required`;
+        } else if (input.type === 'email' && !this.validateEmail(input.value)) {
+            isValid = false;
+            errorMessage = 'Please enter a valid email address';
+        } else if (input.id === 'signup-password' && !this.validatePassword(input.value)) {
+            isValid = false;
+            errorMessage = 'Password must meet the requirements';
+        }
+
+        // Show error if validation fails
+        if (!isValid && helperText) {
+            formGroup.classList.add('error');
+            helperText.textContent = errorMessage;
+            helperText.classList.add('visible');
+        }
+
+        return isValid;
+    }
+
+    static clearError(input) {
+        const formGroup = input.closest('.form-group');
+        const helperText = formGroup.querySelector('.helper-text');
+        if (formGroup) {
+            formGroup.classList.remove('error');
+        }
+        if (helperText) {
+            helperText.classList.remove('visible');
+        }
+    }
+
+    static validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    static clearAllErrors(form) {
+        form.querySelectorAll('.error-message').forEach(errorDiv => {
+            errorDiv.classList.remove('active');
+        });
+        form.querySelectorAll('.form-group').forEach(group => {
+            group.classList.remove('error');
+        });
     }
 
     static initializePasswordToggles() {
@@ -74,12 +147,29 @@ class AuthManager {
     // Form Handling
     static async handleLogin(e) {
         e.preventDefault();
-        const psId = document.getElementById('login-psid').value;
-        const password = document.getElementById('login-password').value;
+        const form = e.target;
+        const psId = document.getElementById('login-psid');
+        const password = document.getElementById('login-password');
 
-        const success = await this.login(psId, password);
+        // Clear previous errors
+        this.clearError(psId);
+        this.clearError(password);
+
+        let isValid = true;
+        if (!psId.value) {
+            this.validateField(psId);
+            isValid = false;
+        }
+        if (!password.value) {
+            this.validateField(password);
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const success = await this.login({ psId: psId.value, password: password.value });
         if (!success) {
-            document.getElementById('login-password').value = '';
+            password.value = '';
         }
     }
 
@@ -101,23 +191,44 @@ class AuthManager {
     }
 
     // Authentication Methods
-    static async login(psId, password) {
-        const users = getUsers();
-        const user = users.find(u => u.psId === psId && u.password === password);
-        
-        if (!user) {
+    static async login(credentials) {
+        try {
+            const { psId, password } = credentials;
+            if (!psId || !password) throw new Error('Missing credentials');
+
+            const sanitizedPsId = sanitizeInput(psId);
+            const users = getUsers();
+
+            // Find user case-insensitive match for PS ID
+            const user = users.find(u =>
+                u.psId.toLowerCase() === sanitizedPsId.toLowerCase() &&
+                u.password === password
+            );
+
+            if (!user) throw new Error('Invalid credentials');
+
+            // Update user's last login
+            const userIndex = users.findIndex(u => u.psId.toLowerCase() === sanitizedPsId.toLowerCase());
+            users[userIndex].lastLogin = new Date().toISOString();
+            users[userIndex].theme = users[userIndex].theme || 'light';
+
+            saveUsers(users);
+
+            // Set session and save user data
+            refreshSession();
+            const { password: _, ...userData } = users[userIndex];
+            localStorage.setItem('userData', JSON.stringify(userData));
+
+            // Apply theme
+            applyTheme(userData.theme);
+
+            window.location.href = 'index.html';
+            return true;
+        } catch (error) {
+            console.error('Login error:', error);
             await showError('Login Failed', 'Invalid PS ID or password');
             return false;
         }
-
-        user.lastLogin = new Date().toISOString();
-        saveUsers(users);
-
-        const { password: _, ...userData } = user;
-        localStorage.setItem('userData', JSON.stringify(userData));
-        
-        window.location.href = 'index.html';
-        return true;
     }
 
     static async register({ psId, name, email, password, confirmPassword }) {
@@ -149,7 +260,7 @@ class AuthManager {
             return false;
         }
 
-        if (!this.isPasswordStrong(password)) {
+        if (!this.validatePassword(password)) {
             showError('Registration Failed', 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character');
             return false;
         }
@@ -168,12 +279,13 @@ class AuthManager {
         return true;
     }
 
-    static isPasswordStrong(password) {
-        const { minLength, patterns } = this.PASSWORD_REQUIREMENTS;
-        return (
-            password.length >= minLength &&
-            Object.values(patterns).every(pattern => pattern.test(password))
-        );
+    static validatePassword(password) {
+        if (!password || typeof password !== 'string') return false;
+        if (password.length < this.PASSWORD_REQUIREMENTS.minLength ||
+            password.length > this.PASSWORD_REQUIREMENTS.maxLength) return false;
+
+        return Object.values(this.PASSWORD_REQUIREMENTS.patterns)
+            .every(pattern => pattern.test(password));
     }
 
     // UI Helpers
@@ -181,7 +293,7 @@ class AuthManager {
         const targetId = button.getAttribute('data-target');
         const input = document.getElementById(targetId);
         const icon = button.querySelector('i');
-        
+
         const isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
         icon.classList.toggle('fa-eye', !isPassword);
@@ -190,13 +302,13 @@ class AuthManager {
 
     static switchForm(e, formType) {
         if (e) e.preventDefault();
-        
+
         const loginContainer = document.getElementById('login-form-container');
         const signupContainer = document.getElementById('signup-form-container');
-        
+
         loginContainer.style.display = formType === 'login' ? 'block' : 'none';
         signupContainer.style.display = formType === 'signup' ? 'block' : 'none';
     }
 }
 
-export default AuthManager; 
+export default AuthManager;
