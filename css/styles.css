@@ -12,11 +12,13 @@
     --bg-primary: #ffffff;
     --bg-secondary-hover: #e4e4e4;
     --bg-secondary: #f0f2f5;
-    /* Changed from #f8f9fa to #f0f2f5 for better contrast */
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     --radius: 12px;
     --container-padding: 20px;
     --bg-primary-rgb: 255, 255, 255;
+    --modal-backdrop: rgba(0, 0, 0, 0.5);
+    --input-border: #ddd;
+    --input-bg: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -31,9 +33,11 @@
     --bg-primary: #1a1a1a;
     --bg-secondary-hover: #222222;
     --bg-secondary: #2f2f2f;
-    /* Changed from #2d2d2d to #2f2f2f for better contrast */
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     --bg-primary-rgb: 26, 26, 26;
+    --modal-backdrop: rgba(0, 0, 0, 0.75);
+    --input-border: #404040;
+    --input-bg: #2d2d2d;
 }
 
 /* Base styles */
@@ -203,7 +207,12 @@ main {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="date"],
+select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-dark);
     width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid var(--text-light);
@@ -292,9 +301,6 @@ input[type="date"]:focus {
     opacity: 1;
 }
 
-input:invalid:not(:focus) {
-    border-color: var(--danger-color);
-}
 
 /* Buttons */
 .primary-button {
@@ -590,7 +596,7 @@ input:invalid:not(:focus) {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0);
+    background: var(--modal-backdrop);
     backdrop-filter: blur(10px);
     z-index: 2000;
     padding: 1rem;
@@ -641,7 +647,7 @@ input:invalid:not(:focus) {
 
 .modal form {
     padding: 1.5rem;
-    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.7);
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.5);
     /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
     border-bottom-right-radius: var(--radius);
     border-bottom-left-radius: var(--radius);
@@ -962,7 +968,7 @@ input:invalid:not(:focus) {
 }
 
 .auth-form label i {
-    color: var (--primary-color);
+    color: var(--primary-color);
     width: 20px;
 }
 
@@ -975,7 +981,7 @@ input:invalid:not(:focus) {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    color: var(--text-dark);
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
 }
@@ -989,7 +995,7 @@ input:invalid:not(:focus) {
 }
 
 .auth-form input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-dark);
 }
 
 .auth-form .primary-button {
@@ -1103,7 +1109,7 @@ input:invalid:not(:focus) {
 .alert-modal-header h3 {
     margin: 0;
     font-size: 1.25rem;
-    color: var (--text-dark);
+    color: var(--text-dark);
 }
 
 .alert-modal-body {
@@ -1119,8 +1125,7 @@ input:invalid:not(:focus) {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-    /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
-    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.7);
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.5);
     border-bottom-left-radius: var(--radius);
     border-bottom-right-radius: var(--radius);
 }

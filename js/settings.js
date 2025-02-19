@@ -55,27 +55,28 @@ class SettingsManager {
     static initializeThemeToggle() {
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
-            themeToggle.checked = getCurrentTheme() === 'dark';
+            // Set initial state
+            const currentTheme = getCurrentTheme();
+            themeToggle.checked = currentTheme === 'dark';
+
+            // Listen for changes
             themeToggle.addEventListener('change', (e) => {
-                const theme = e.target.checked ? 'dark' : 'light';
-                // Update theme in both localStorage and user data
-                applyTheme(theme);
+                const newTheme = e.target.checked ? 'dark' : 'light';
+                applyTheme(newTheme);
 
-                // Save theme preference to user data
-                const users = getUsers();
-                const currentUser = getCurrentUser();
-                if (currentUser && users.length > 0) {
-                    const userIndex = users.findIndex(u => u.psId === currentUser.psId);
-                    if (userIndex !== -1) {
-                        users[userIndex].theme = theme;
-                        saveUsers(users);
-
-                        // Update current user data in localStorage
-                        const userData = { ...currentUser, theme };
-                        localStorage.setItem('userData', JSON.stringify(userData));
-                    }
-                }
+                // No need to manually update user data here as applyTheme handles it
             });
+
+            // Listen for system theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    if (!localStorage.getItem('theme')) { // Only if user hasn't set a preference
+                        const newTheme = e.matches ? 'dark' : 'light';
+                        themeToggle.checked = e.matches;
+                        applyTheme(newTheme);
+                    }
+                });
+            }
         }
     }
 

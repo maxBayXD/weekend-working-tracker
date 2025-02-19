@@ -1,11 +1,51 @@
 // Theme Management
 function applyTheme(theme = 'light') {
+    if (theme !== 'light' && theme !== 'dark') {
+        theme = 'light'; // Fallback to light if invalid theme
+    }
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
+
+    // Update theme for current user if logged in
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+        const user = JSON.parse(userData);
+        user.theme = theme;
+        localStorage.setItem('userData', JSON.stringify(user));
+
+        // Also update in users array
+        const users = getUsers();
+        const userIndex = users.findIndex(u => u.psId === user.psId);
+        if (userIndex !== -1) {
+            users[userIndex].theme = theme;
+            saveUsers(users);
+        }
+    }
 }
 
 function getCurrentTheme() {
-    return localStorage.getItem('theme') || 'light';
+    // First check user preferences
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+        const user = JSON.parse(userData);
+        if (user.theme) {
+            return user.theme;
+        }
+    }
+
+    // Then check localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        return savedTheme;
+    }
+
+    // Finally check system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+    }
+
+    // Default to light
+    return 'light';
 }
 
 // User Management
