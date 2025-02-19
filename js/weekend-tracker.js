@@ -1,4 +1,4 @@
-import { getCurrentUser, showSuccess, showError } from './utils.js';
+import { getCurrentUser, showSuccess, showError, showWarning } from './utils.js';
 
 class WeekendTracker {
     static initialize() {
@@ -71,6 +71,7 @@ class WeekendTracker {
                         <th>Comp Off Earned</th>
                         <th>Comp Off Availed</th>
                         <th>Expense Claimed</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,6 +90,11 @@ class WeekendTracker {
             day: 'numeric'
         }) : 'N/A'}</td>
                             <td class="status ${entry.expenseClaimed}">${entry.expenseClaimed}</td>
+                            <td>
+                                <button class="delete-button" onclick="WeekendTracker.deleteEntry('${entry.weekendDate}')" title="Delete Entry">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -121,6 +127,31 @@ class WeekendTracker {
         }
     }
 
+    static async deleteEntry(weekendDate) {
+        const confirmed = await showWarning(
+            'Delete Entry',
+            'Are you sure you want to delete this weekend working entry? This action cannot be undone.',
+            true
+        );
+
+        if (confirmed) {
+            try {
+                const entries = JSON.parse(localStorage.getItem('weekendEntries') || '[]');
+                const currentUser = getCurrentUser();
+                const updatedEntries = entries.filter(entry =>
+                    !(entry.userId === currentUser.psId && entry.weekendDate === weekendDate)
+                );
+
+                localStorage.setItem('weekendEntries', JSON.stringify(updatedEntries));
+                this.loadEntries();
+                await showSuccess('Success', 'Weekend working entry has been deleted successfully.');
+            } catch (error) {
+                console.error('Delete entry error:', error);
+                await showError('Error', 'Failed to delete weekend working entry.');
+            }
+        }
+    }
+
     static getEntries() {
         const userId = getCurrentUser().psId;
         try {
@@ -138,5 +169,8 @@ class WeekendTracker {
         localStorage.setItem('weekendEntries', JSON.stringify(entries));
     }
 }
+
+// Make WeekendTracker available globally for onclick handlers
+window.WeekendTracker = WeekendTracker;
 
 export default WeekendTracker;

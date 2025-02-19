@@ -63,9 +63,16 @@ class AuthManager {
     static addInputValidation(form) {
         const inputs = form.querySelectorAll('input');
         inputs.forEach(input => {
-            // Add validation listeners
             input.addEventListener('blur', () => this.validateField(input));
-            input.addEventListener('input', () => this.clearError(input));
+            // Update the input event to hide error messages immediately
+            input.addEventListener('input', () => {
+                const formGroup = input.closest('.form-group');
+                const helperText = formGroup.querySelector('.helper-text');
+                formGroup.classList.remove('error');
+                if (helperText) {
+                    helperText.classList.remove('visible');
+                }
+            });
         });
     }
 
@@ -77,29 +84,29 @@ class AuthManager {
         formGroup.classList.remove('error');
         helperText?.classList.remove('visible');
 
-        // Validate field
-        let isValid = true;
+        // Get dynamic error message based on input type and validation
         let errorMessage = '';
-
         if (!input.value) {
-            isValid = false;
-            errorMessage = `${input.placeholder} is required`;
+            errorMessage = `Please enter your ${input.placeholder.toLowerCase()}`;
         } else if (input.type === 'email' && !this.validateEmail(input.value)) {
-            isValid = false;
             errorMessage = 'Please enter a valid email address';
         } else if (input.id === 'signup-password' && !this.validatePassword(input.value)) {
-            isValid = false;
-            errorMessage = 'Password must meet the requirements';
+            errorMessage = 'Password must contain at least 8 characters with uppercase, lowercase, number and special character';
+        } else if (input.id === 'confirm-password' && input.value !== document.getElementById('signup-password').value) {
+            errorMessage = 'Passwords do not match';
         }
 
-        // Show error if validation fails
-        if (!isValid && helperText) {
+        // Show error if there is an error message
+        if (errorMessage) {
             formGroup.classList.add('error');
-            helperText.textContent = errorMessage;
-            helperText.classList.add('visible');
+            if (helperText) {
+                helperText.textContent = errorMessage;
+                helperText.classList.add('visible');
+            }
+            return false;
         }
 
-        return isValid;
+        return true;
     }
 
     static clearError(input) {

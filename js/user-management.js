@@ -50,27 +50,25 @@ class UserManager {
         helperText?.classList.remove('visible');
 
         // Validate field
-        let isValid = true;
-        let errorMessage = '';
-
         if (!input.value) {
-            isValid = false;
-            errorMessage = `${input.placeholder} is required`;
-        } else if (input.type === 'email' && !this.validateEmail(input.value)) {
-            isValid = false;
-            errorMessage = 'Please enter a valid email address';
-        }
-
-        // Show error if validation fails
-        if (!isValid) {
             formGroup.classList.add('error');
             if (helperText) {
-                helperText.textContent = errorMessage;
+                helperText.textContent = `${input.placeholder} is required`;
                 helperText.classList.add('visible');
             }
+            return false;
         }
 
-        return isValid;
+        if (input.type === 'email' && !this.validateEmail(input.value)) {
+            formGroup.classList.add('error');
+            if (helperText) {
+                helperText.textContent = 'Please enter a valid email address';
+                helperText.classList.add('visible');
+            }
+            return false;
+        }
+
+        return true;
     }
 
     static clearError(input) {

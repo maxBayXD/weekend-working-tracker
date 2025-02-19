@@ -82,11 +82,16 @@ class SettingsManager {
     static initializePasswordForm() {
         const passwordForm = document.getElementById('password-change-form');
         if (passwordForm) {
-            // Add validation to each input
             const inputs = passwordForm.querySelectorAll('input');
             inputs.forEach(input => {
-                input.addEventListener('input', () => this.validatePasswordField(input));
                 input.addEventListener('blur', () => this.validatePasswordField(input));
+                // Add input event listener to hide error messages
+                input.addEventListener('input', () => {
+                    const formGroup = input.closest('.form-group');
+                    const helperText = formGroup.querySelector('.helper-text');
+                    formGroup.classList.remove('error');
+                    helperText.classList.remove('error', 'active');
+                });
             });
 
             passwordForm.addEventListener('submit', async (e) => {
@@ -134,15 +139,21 @@ class SettingsManager {
         formGroup.classList.remove('error');
         helperText.classList.remove('error', 'active');
 
+        // Get dynamic error message based on input type and validation
+        let errorMessage = '';
         if (!input.value) {
-            formGroup.classList.add('error');
-            helperText.classList.add('error', 'active');
-            return false;
+            errorMessage = `Please enter your ${input.placeholder.toLowerCase()}`;
+        } else if (input.id === 'new-password' && !this.isPasswordStrong(input.value)) {
+            errorMessage = 'Password must contain at least 8 characters with uppercase, lowercase, number and special character';
+        } else if (input.id === 'confirm-password' && input.value !== document.getElementById('new-password').value) {
+            errorMessage = 'Passwords do not match';
         }
 
-        if (input.id === 'new-password' && !this.isPasswordStrong(input.value)) {
+        // Show error if there is an error message
+        if (errorMessage) {
             formGroup.classList.add('error');
             helperText.classList.add('error', 'active');
+            helperText.textContent = errorMessage;
             return false;
         }
 

@@ -891,7 +891,7 @@ input:invalid:not(:focus) {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid var(--text-light);
-    border-radius: var(--radius);
+    border-radius: var (--radius);
     font-size: 1rem;
     transition: all 0.3s ease;
     background: var(--bg-primary);
@@ -1265,4 +1265,67 @@ select:focus {
     .weekend-table td {
         min-width: 160px;
     }
+}
+
+/* Checkbox Styles */
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-dark);
+    font-size: 1rem;
+    min-height: 24px;
+}
+
+.checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.checkbox-label .checkmark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 24px;
+    width: 24px;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--text-light);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.checkbox-label:hover .checkmark {
+    border-color: var(--primary-color);
+}
+
+.checkbox-label input:checked~.checkmark {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-label .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label input:checked~.checkmark:after {
+    display: block;
+}
+
+.checkbox-label input:focus~.checkmark {
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
