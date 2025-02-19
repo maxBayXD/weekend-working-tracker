@@ -14,6 +14,7 @@
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     --radius: 12px;
     --container-padding: 20px;
+    --bg-primary-rgb: 255, 255, 255;
 }
 
 [data-theme="dark"] {
@@ -28,6 +29,7 @@
     --bg-primary: #1a1a1a;
     --bg-secondary: #2d2d2d;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    --bg-primary-rgb: 26, 26, 26;
 }
 
 /* Base styles */
@@ -584,7 +586,8 @@ input:invalid:not(:focus) {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(10px);
     z-index: 2000;
     padding: 1rem;
 }
@@ -596,19 +599,24 @@ input:invalid:not(:focus) {
 }
 
 .modal-content {
-    background: var(--bg-primary);
-    border-radius: var(--radius);
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.8);
+    backdrop-filter: blur(12px);
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
     width: 100%;
     max-width: 500px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius);
 }
 
 .modal-header {
     padding: 1.5rem;
-    border-bottom: 1px solid var(--text-light);
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.5);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-top-right-radius: var(--radius);
+    border-top-left-radius: var(--radius);
 }
 
 .modal-header h2 {
@@ -628,6 +636,10 @@ input:invalid:not(:focus) {
 
 .modal form {
     padding: 1.5rem;
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.7);
+    /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
+    border-bottom-right-radius: var(--radius);
+    border-bottom-left-radius: var(--radius);
 }
 
 .modal-buttons {
@@ -668,6 +680,7 @@ input:invalid:not(:focus) {
 /* Weekend Form Modal Styles */
 .weekend-modal .modal-content {
     max-width: 600px;
+
 }
 
 .weekend-modal .form-row {
@@ -756,7 +769,7 @@ input:invalid:not(:focus) {
     margin-top: 1rem;
     background: var(--bg-secondary);
     padding: 1rem;
-    border-radius: var(--radius);
+    border-radius: var (--radius);
 }
 
 /* Mobile Styles */
@@ -995,7 +1008,8 @@ input:invalid:not(:focus) {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(10px);
     z-index: 2000;
     padding: 1rem;
 }
@@ -1007,20 +1021,26 @@ input:invalid:not(:focus) {
 }
 
 .alert-modal-content {
-    background: var(--bg-primary);
-    border-radius: var (--radius);
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.8);
+    backdrop-filter: blur(12px);
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
     width: 100%;
     max-width: 400px;
     box-shadow: var(--shadow);
     animation: modalSlideIn 0.3s ease;
+    border-radius: var(--radius);
+
 }
 
 .alert-modal-header {
     padding: 1.25rem;
-    border-bottom: 1px solid var(--text-light);
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.5);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
 }
 
 .alert-modal-header i {
@@ -1054,6 +1074,7 @@ input:invalid:not(:focus) {
     color: var(--text-light);
     font-size: 1rem;
     line-height: 1.5;
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.5);
 }
 
 .alert-modal-footer {
@@ -1061,7 +1082,10 @@ input:invalid:not(:focus) {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-    border-top: 1px solid var(--text-light);
+    /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
+    background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.7);
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
 }
 
 .alert-modal-footer button {
@@ -1194,9 +1218,9 @@ input:invalid:not(:focus) {
 .weekend-form {
     background: var(--bg-primary);
     padding: 1.5rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+    /* border-radius: var(--radius); */
+    /* box-shadow: var(--shadow); */
+    /* margin-bottom: 2rem; */
 }
 
 .form-row {
