@@ -1,24 +1,51 @@
 # Weekend Working Tracker
 
-A web-based application to track weekend work, comp-offs, and expense claims.
+A web application to track weekend working hours and manage compensation time-off for employees.
 
 ## Features
 
-- User authentication with role-based access (Admin/User)
-- Dashboard for tracking weekend work entries
-- Admin panel for user management
-- Theme customization (Light/Dark mode)
-- Responsive design for mobile and desktop
-- Password management with security requirements
-- Session management and auto-logout
+- **User Authentication**: Secure login and registration system
+- **Weekend Work Tracking**: Log weekend working days
+- **Compensation Management**: Track comp-off earnings and usage
+- **Dark Mode Support**: Comfortable viewing experience in low-light conditions
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
 
-## Getting Started
+## Theme Support
+
+The application supports both light and dark themes:
+- **Light Theme**: Default theme optimized for daytime use
+- **Dark Theme**: Eye-friendly dark mode for low-light environments
+  - Enhanced contrast for better readability
+  - Properly visible form controls and icons in dark mode
+  - Consistent styling across all components
+
+## Recent Updates
+
+### Version 1.1.0
+- Added dark mode support with proper icon visibility
+- Fixed calendar and dropdown icons in dark theme
+- Improved form control contrast in dark mode
+- Enhanced overall accessibility
+
+### Version 1.0.0
+- Initial release with basic weekend tracking functionality
+- User authentication system
+- Responsive design implementation
+
+## Installation
 
 1. Clone the repository
-2. Open `index.html` in a modern web browser
-3. Login with default admin credentials:
-   - PS ID: admin
-   - Password: Admin@123
+2. Install dependencies
+3. Configure environment variables
+4. Run the application
+
+## Usage
+
+1. Register or login to your account
+2. Navigate to the weekend tracker
+3. Add new weekend working entries
+4. Manage your compensation time-off
+5. Toggle between light and dark themes as needed
 
 ## Project Structure
 
@@ -108,6 +135,19 @@ Theme colors and common values are defined as CSS variables for easy customizati
 - Safari (latest)
 - Edge (latest)
 
+## Development
+
+### Prerequisites
+- Modern web browser
+- Basic understanding of HTML, CSS, and JavaScript
+
+### Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
 ## License
 
-MIT License - Feel free to use and modify for your needs.
+This project is licensed under the MIT License - see the LICENSE file for details.
