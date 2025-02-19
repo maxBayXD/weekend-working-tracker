@@ -49,7 +49,6 @@ Supports dynamic theme switching:
 ├── index.html        # Main application page
 ├── css/             # Stylesheets
 ├── js/              # JavaScript modules
-└── assets/          # Images and icons
 ```
 
 ## 🔧 Development
