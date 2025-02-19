@@ -367,6 +367,34 @@ input:invalid:not(:focus) {
     font-size: 1.1rem;
 }
 
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-button:hover {
+    background: rgba(26, 115, 232, 0.1);
+    transform: scale(1.1);
+}
+
+.edit-button i {
+    font-size: 1.1rem;
+}
+
 /* User Info */
 .user-info-grid {
     display: grid;

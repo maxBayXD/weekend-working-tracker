@@ -4,6 +4,7 @@ class WeekendTracker {
     static initialize() {
         this.initializeEventListeners();
         this.loadEntries();
+        this.currentEditingEntry = null; // Add this line to track editing state
     }
 
     static initializeEventListeners() {
@@ -13,9 +14,13 @@ class WeekendTracker {
         const form = document.getElementById('weekend-form');
         const compOffEarned = document.getElementById('comp-off-earned');
         const compOffDateGroup = document.getElementById('comp-off-date-group');
+        const modalTitle = modal.querySelector('.modal-header h2');
 
         // Add Entry button
         addButton.addEventListener('click', () => {
+            this.currentEditingEntry = null;
+            modalTitle.textContent = 'Add Weekend Working Entry';
+            form.reset();
             modal.classList.add('active');
         });
 
@@ -24,6 +29,7 @@ class WeekendTracker {
             button.addEventListener('click', () => {
                 modal.classList.remove('active');
                 form.reset();
+                this.currentEditingEntry = null;
             });
         });
 
@@ -88,12 +94,17 @@ class WeekendTracker {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
-        }) : 'N/A'}</td>
+        }) : 'Not Applicable'}</td>
                             <td class="status ${entry.expenseClaimed}">${entry.expenseClaimed}</td>
                             <td>
-                                <button class="delete-button" onclick="WeekendTracker.deleteEntry('${entry.weekendDate}')" title="Delete Entry">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="action-buttons">
+                                    <button class="edit-button" onclick="WeekendTracker.editEntry('${entry.weekendDate}')" title="Edit Entry">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="delete-button" onclick="WeekendTracker.deleteEntry('${entry.weekendDate}')" title="Delete Entry">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `).join('')}
@@ -106,24 +117,93 @@ class WeekendTracker {
         e.preventDefault();
         const form = e.target;
         const modal = document.getElementById('weekend-modal');
+        const weekendDate = form.querySelector('#weekend-date').value;
+        const currentUser = getCurrentUser();
+
+        // Check for duplicate date only when adding new entry
+        if (!this.currentEditingEntry) {
+            const existingEntries = JSON.parse(localStorage.getItem('weekendEntries') || '[]');
+            const hasDuplicate = existingEntries.some(entry =>
+                entry.userId === currentUser.psId &&
+                entry.weekendDate === weekendDate
+            );
+
+            if (hasDuplicate) {
+                await showError('Error', 'An entry for this date already exists. Please choose a different date.');
+                return;
+            }
+        }
 
         const entry = {
-            weekendDate: form.querySelector('#weekend-date').value,
+            weekendDate,
             compOffEarned: form.querySelector('#comp-off-earned').value,
             compOffDate: form.querySelector('#comp-off-date').value || null,
             expenseClaimed: form.querySelector('#expense-claimed').value,
-            userId: getCurrentUser().psId,
-            createdAt: new Date().toISOString()
+            userId: currentUser.psId,
+            createdAt: this.currentEditingEntry ? this.currentEditingEntry.createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
         try {
-            this.saveEntry(entry);
-            modal.classList.remove('active'); // Close modal
-            form.reset(); // Reset form
-            this.loadEntries(); // Refresh entries
-            await showSuccess('Success', 'Weekend working entry added successfully');
+            if (this.currentEditingEntry) {
+                this.updateEntry(entry);
+                await showSuccess('Success', 'Weekend working entry updated successfully');
+            } else {
+                this.saveEntry(entry);
+                await showSuccess('Success', 'Weekend working entry added successfully');
+            }
+
+            modal.classList.remove('active');
+            form.reset();
+            this.currentEditingEntry = null;
+            this.loadEntries();
         } catch (error) {
             await showError('Error', error.message);
+        }
+    }
+
+    static async editEntry(weekendDate) {
+        const entries = JSON.parse(localStorage.getItem('weekendEntries') || '[]');
+        const currentUser = getCurrentUser();
+        const entry = entries.find(e => e.userId === currentUser.psId && e.weekendDate === weekendDate);
+
+        if (!entry) {
+            await showError('Error', 'Entry not found');
+            return;
+        }
+
+        this.currentEditingEntry = entry;
+
+        // Populate the form with existing data
+        const form = document.getElementById('weekend-form');
+        const modal = document.getElementById('weekend-modal');
+        const modalTitle = modal.querySelector('.modal-header h2');
+
+        modalTitle.textContent = 'Edit Weekend Working Entry';
+        form.querySelector('#weekend-date').value = entry.weekendDate;
+        form.querySelector('#comp-off-earned').value = entry.compOffEarned;
+        form.querySelector('#comp-off-date').value = entry.compOffDate || '';
+        form.querySelector('#expense-claimed').value = entry.expenseClaimed;
+
+        // Show/hide comp off date based on comp off earned value
+        const compOffDateGroup = document.getElementById('comp-off-date-group');
+        compOffDateGroup.style.display = entry.compOffEarned === 'yes' ? 'block' : 'none';
+
+        modal.classList.add('active');
+    }
+
+    static updateEntry(updatedEntry) {
+        const entries = JSON.parse(localStorage.getItem('weekendEntries') || '[]');
+        const currentUser = getCurrentUser();
+
+        const index = entries.findIndex(entry =>
+            entry.userId === currentUser.psId &&
+            entry.weekendDate === this.currentEditingEntry.weekendDate
+        );
+
+        if (index !== -1) {
+            entries[index] = updatedEntry;
+            localStorage.setItem('weekendEntries', JSON.stringify(entries));
         }
     }
 
@@ -138,6 +218,8 @@ class WeekendTracker {
             try {
                 const entries = JSON.parse(localStorage.getItem('weekendEntries') || '[]');
                 const currentUser = getCurrentUser();
+
+                // Filter out all entries matching the date for current user
                 const updatedEntries = entries.filter(entry =>
                     !(entry.userId === currentUser.psId && entry.weekendDate === weekendDate)
                 );
