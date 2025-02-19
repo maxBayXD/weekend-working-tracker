@@ -12,7 +12,7 @@
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    --radius: 8px;
+    --radius: 12px;
     --container-padding: 20px;
 }
 
@@ -1120,7 +1120,7 @@ input:invalid:not(:focus) {
     gap: 1rem;
     padding: 1rem;
     background: var(--bg-primary);
-    border-radius: var (--radius);
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
 }
