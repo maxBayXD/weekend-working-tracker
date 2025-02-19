@@ -10,7 +10,9 @@
     --text-dark: #2c3e50;
     --text-light: #666;
     --bg-primary: #ffffff;
-    --bg-secondary: #f8f9fa;
+    --bg-secondary-hover: #e4e4e4;
+    --bg-secondary: #f0f2f5;
+    /* Changed from #f8f9fa to #f0f2f5 for better contrast */
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     --radius: 12px;
     --container-padding: 20px;
@@ -27,7 +29,9 @@
     --text-dark: #ffffff;
     --text-light: #b0b0b0;
     --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
+    --bg-secondary-hover: #222222;
+    --bg-secondary: #2f2f2f;
+    /* Changed from #2d2d2d to #2f2f2f for better contrast */
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     --bg-primary-rgb: 26, 26, 26;
 }
@@ -600,6 +604,7 @@ input:invalid:not(:focus) {
 
 .modal-content {
     background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     /* border: 1px solid rgba(255, 255, 255, 0.2); */
     width: 100%;
@@ -742,7 +747,7 @@ input:invalid:not(:focus) {
 }
 
 .expandable-header:hover {
-    background: var(--bg-secondary);
+    background: var(--bg-secondary-hover);
 }
 
 .expandable-header i {
@@ -769,7 +774,7 @@ input:invalid:not(:focus) {
     margin-top: 1rem;
     background: var(--bg-secondary);
     padding: 1rem;
-    border-radius: var (--radius);
+    border-radius: var(--radius);
 }
 
 /* Mobile Styles */
@@ -894,6 +899,8 @@ input:invalid:not(:focus) {
 .auth-page {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     min-height: 100vh;
+    position: relative;
+    overflow: hidden;
 }
 
 .auth-page .navbar {
@@ -910,14 +917,18 @@ input:invalid:not(:focus) {
 }
 
 .auth-card {
-    background: var(--bg-primary);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background: rgba(var(--bg-primary-rgb), 0.2);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    border-radius: var(--radius);
 }
 
 .auth-form {
     padding: 2rem;
+    background: transparent;
 }
 
 .auth-header {
@@ -926,9 +937,10 @@ input:invalid:not(:focus) {
 }
 
 .auth-header h2 {
-    color: var(--text-dark);
+    color: white;
     font-size: 1.8rem;
     margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .auth-header h2 i {
@@ -945,7 +957,7 @@ input:invalid:not(:focus) {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
-    color: var(--text-dark);
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
 }
 
@@ -958,20 +970,26 @@ input:invalid:not(:focus) {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid var(--text-light);
-    border-radius: var (--radius);
+    border-radius: var(--radius);
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: var(--bg-primary);
-    color: var(--text-dark);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .auth-form input:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .auth-form input::placeholder {
-    color: var(--text-light);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .auth-form .primary-button {
@@ -986,18 +1004,36 @@ input:invalid:not(:focus) {
 .auth-switch {
     text-align: center;
     margin-top: 1.5rem;
-    color: var(--text-dark);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .auth-switch a {
-    color: var(--primary-color);
-    text-decoration: none;
+    color: white;
+    text-decoration: underline;
+    text-underline-offset: 2px;
     font-weight: 500;
     transition: color 0.2s ease;
 }
 
 .auth-switch a:hover {
+    text-decoration: none;
     color: var(--primary-hover);
+}
+
+.toggle-password {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.toggle-password:hover {
+    color: white;
+}
+
+.helper-text {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.helper-text.error {
+    color: #ff6b6b;
 }
 
 /* Custom Alert Modal */
@@ -1022,6 +1058,7 @@ input:invalid:not(:focus) {
 
 .alert-modal-content {
     background: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     /* border: 1px solid rgba(255, 255, 255, 0.2); */
     width: 100%;
@@ -1066,7 +1103,7 @@ input:invalid:not(:focus) {
 .alert-modal-header h3 {
     margin: 0;
     font-size: 1.25rem;
-    color: var(--text-dark);
+    color: var (--text-dark);
 }
 
 .alert-modal-body {
@@ -1232,7 +1269,7 @@ input:invalid:not(:focus) {
 
 .weekend-card {
     background: var(--bg-primary);
-    border-radius: var (--radius);
+    border-radius: var(--radius);
     padding: 1.25rem;
     box-shadow: var(--shadow);
     margin-bottom: 1rem;
