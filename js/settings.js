@@ -83,15 +83,46 @@ class SettingsManager {
     static initializePasswordForm() {
         const passwordForm = document.getElementById('password-change-form');
         if (passwordForm) {
+            // Populate hidden field for password managers
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                const psIdField = document.getElementById('ps-id');
+                if (psIdField) psIdField.value = currentUser.psId;
+            }
+
             const inputs = passwordForm.querySelectorAll('input');
             inputs.forEach(input => {
                 input.addEventListener('blur', () => this.validatePasswordField(input));
-                // Add input event listener to hide error messages
                 input.addEventListener('input', () => {
                     const formGroup = input.closest('.form-group');
                     const helperText = formGroup.querySelector('.helper-text');
                     formGroup.classList.remove('error');
-                    helperText.classList.remove('error', 'active');
+                    helperText.textContent = '';
+                    helperText.classList.remove('error', 'visible');
+                });
+            });
+
+            // Enhanced reset handler
+            passwordForm.addEventListener('reset', () => {
+                // Clear all input values
+                inputs.forEach(input => {
+                    input.value = ''; // Explicitly clear input values
+                    const formGroup = input.closest('.form-group');
+                    const helperText = formGroup.querySelector('.helper-text');
+                    formGroup.classList.remove('error');
+                    helperText.textContent = '';
+                    helperText.classList.remove('error', 'visible');
+                });
+
+                // Reset password toggle buttons and input types
+                document.querySelectorAll('.toggle-password i').forEach(icon => {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                });
+                document.querySelectorAll('input').forEach(input => {
+                    if (input.type === 'text') {
+                        input.type = 'password';
+                    }
                 });
             });
 
@@ -132,13 +163,9 @@ class SettingsManager {
         });
     }
 
-    static validatePasswordField(input) {
+    static async validatePasswordField(input) {
         const formGroup = input.closest('.form-group');
         const helperText = formGroup.querySelector('.helper-text');
-
-        // Clear existing error state
-        formGroup.classList.remove('error');
-        helperText.classList.remove('error', 'active');
 
         // Get dynamic error message based on input type and validation
         let errorMessage = '';
@@ -152,9 +179,9 @@ class SettingsManager {
 
         // Show error if there is an error message
         if (errorMessage) {
-            formGroup.classList.add('error');
-            helperText.classList.add('error', 'active');
+            // formGroup.classList.add('error');
             helperText.textContent = errorMessage;
+            helperText.classList.add('error', 'visible');
             return false;
         }
 
@@ -166,6 +193,13 @@ class SettingsManager {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => logout());
         }
+    }
+
+    // Reset form fields directly
+    static resetfields() {
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
     }
 
     static async handlePasswordChange() {
@@ -186,18 +220,21 @@ class SettingsManager {
         // Verify current password
         if (users[userIndex].password !== currentPassword) {
             await showError('Error', 'Current password is incorrect');
+            // this.resetfields();
             return;
         }
 
         // Validate new password
         if (newPassword !== confirmPassword) {
             await showError('Error', 'New passwords do not match');
+            // this.resetfields();
             return;
         }
 
         // Check if new password is same as current
         if (newPassword === currentPassword) {
             await showError('Error', 'New password cannot be the same as current password');
+            // this.resetfields();
             return;
         }
 
@@ -207,14 +244,27 @@ class SettingsManager {
             return;
         }
 
-        // Update password
-        users[userIndex].password = newPassword;
-        saveUsers(users);
+        try {
+            // Update password
+            users[userIndex].password = newPassword;
+            saveUsers(users);
 
-        // Clear form
-        document.getElementById('password-change-form').reset();
+            // Show success message and then logout
+            await showSuccess('Success', 'Password changed successfully. You will be logged out for security reasons.');
 
-        // Reset password toggle buttons
+            // Small delay before logout
+            setTimeout(() => logout(), 1500);
+        } catch (error) {
+            console.error('Error changing password:', error);
+            await showError('Error', 'Failed to change password');
+        }
+
+        // Reset form fields directly
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+
+        // Reset password toggle buttons and input types
         document.querySelectorAll('.toggle-password i').forEach(icon => {
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
@@ -223,11 +273,16 @@ class SettingsManager {
             input.type = 'password';
         });
 
-        // Show success message and then logout
-        await showSuccess('Success', 'Password changed successfully. You will be logged out for security reasons.');
+        // Clear any error states
+        document.querySelectorAll('.form-group').forEach(group => {
+            group.classList.remove('error');
+            const helperText = group.querySelector('.helper-text');
+            if (helperText) {
+                helperText.textContent = '';
+                helperText.classList.remove('error', 'visible');
+            }
+        });
 
-        // Logout after showing success message
-        logout();
     }
 
     static isPasswordStrong(password) {

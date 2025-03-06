@@ -84,10 +84,19 @@
                     <div id="password-section" class="expandable-content">
                         <div class="password-change-section">
                             <form id="password-change-form" class="settings-form">
+                                <!-- Add hidden field for password managers -->
+                                <div class="form-group">
+                                    <label for="ps-id">User Name: </label>
+                                    <div class="password-input-group">
+                                        <input type="text" id="ps-id" name="username" autocomplete="username" disabled>
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label for="current-password">Current Password: </label>
                                     <div class="password-input-group">
-                                        <input type="password" id="current-password" placeholder="Current password">
+                                        <input type="password" id="current-password" placeholder="Current password"
+                                            autocomplete="current-password">
                                         <button type="button" class="toggle-password" data-target="current-password">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -97,7 +106,8 @@
                                 <div class="form-group">
                                     <label for="new-password">New Password:</label>
                                     <div class="password-input-group">
-                                        <input type="password" id="new-password" placeholder="New password">
+                                        <input type="password" id="new-password" placeholder="New password"
+                                            autocomplete="new-password">
                                         <button type="button" class="toggle-password" data-target="new-password">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -107,7 +117,8 @@
                                 <div class="form-group">
                                     <label for="confirm-password">Confirm New Password:</label>
                                     <div class="password-input-group">
-                                        <input type="password" id="confirm-password" placeholder="Confirm new password">
+                                        <input type="password" id="confirm-password" placeholder="Confirm new password"
+                                            autocomplete="new-password">
                                         <button type="button" class="toggle-password" data-target="confirm-password">
                                             <i class="fas fa-eye"></i>
                                         </button>

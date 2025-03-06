@@ -265,7 +265,7 @@ input[type="date"]:focus {
 /* Form Helper Text */
 .helper-text {
     display: none;
-    /* Hide by default */
+    font-weight: bold;
     font-size: 0.85rem;
     margin-top: 0.25rem;
     color: var(--text-light);
@@ -1151,6 +1151,14 @@ input[type="date"]:focus {
     position: relative;
     display: flex;
     align-items: center;
+}
+
+input:disabled {
+    /* Gray text */
+    color: #a0a0a0;
+    /* Dashed border */
+    border: 1px dashed #a0a0a0;
+    cursor: not-allowed;
 }
 
 .password-input-group input {

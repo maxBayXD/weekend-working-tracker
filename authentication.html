@@ -32,7 +32,7 @@
                             <label for="login-psid">
                                 <i class="fas fa-user"></i> PS ID:
                             </label>
-                            <input type="text" id="login-psid" placeholder="Enter your PS ID">
+                            <input type="text" id="login-psid" placeholder="Enter your PS ID" autocomplete="username">
                             <div class="helper-text error">Please enter your PS ID</div>
                         </div>
                         <div class="form-group">
@@ -40,7 +40,8 @@
                                 <i class="fas fa-lock"></i> Password:
                             </label>
                             <div class="password-input-group">
-                                <input type="password" id="login-password" placeholder="Enter your password">
+                                <input type="password" id="login-password" placeholder="Enter your password"
+                                    autocomplete="current-password">
                                 <button type="button" class="toggle-password" data-target="login-password">
                                     <i class="fas fa-eye"></i>
                                 </button>

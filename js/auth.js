@@ -98,10 +98,10 @@ class AuthManager {
 
         // Show error if there is an error message
         if (errorMessage) {
-            formGroup.classList.add('error');
+            // formGroup.classList.add('error');
             if (helperText) {
                 helperText.textContent = errorMessage;
-                helperText.classList.add('visible');
+                helperText.classList.add('error', 'visible');
             }
             return false;
         }
